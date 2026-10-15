@@ -20,6 +20,9 @@ for (const file of pages) {
   html = html.replaceAll('logo.svg', 'logo.png');
   html = html.replaceAll('alt="Victory View Hotel & Suites"', 'alt="Victory View Hotel"');
   html = html.replaceAll('<span>HOTEL <i>&amp;</i> SUITES</span>', '');
+  html = html.replaceAll('↗', '<span class="arrow-icon arrow-up-right" aria-hidden="true"></span>');
+  html = html.replaceAll('↓', '<span class="arrow-icon arrow-down" aria-hidden="true"></span>');
+  html = html.replaceAll('↑', '<span class="arrow-icon arrow-up" aria-hidden="true"></span>');
   fs.writeFileSync(file, html);
 }
 console.log(`Built ${routes.length} static pages and copied the hotel assets to dist/.`);
