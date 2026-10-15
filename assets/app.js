@@ -1,3 +1,5 @@
+export const MAP_EMBED_URL = 'https://www.google.com/maps?q=Victory+View+Hotel+%26+Suites+122+DSC+Expressway+Ovwian+Axis+Udu+Delta+State+Nigeria&output=embed';
+
 const toggle = document.querySelector('.nav-toggle');
 const nav = document.querySelector('.primary-nav');
 if (toggle && nav) {
@@ -25,6 +27,24 @@ if (toggle && nav) {
 }
 const year = document.querySelector('#year');
 if (year) year.textContent = String(new Date().getFullYear());
+
+for (const frame of document.querySelectorAll('[data-map-embed]')) {
+  const fallback = frame.parentElement.querySelector('.map-fallback');
+  const stack = frame.closest('.location-map-stack');
+  let loaded = false;
+  frame.addEventListener('load', () => { loaded = true; });
+  const showAddressFallback = () => {
+    if (!loaded && fallback) {
+      frame.hidden = true;
+      fallback.hidden = false;
+    }
+  };
+  frame.src = MAP_EMBED_URL;
+  frame.addEventListener('pointerdown', () => frame.classList.add('map-active'), { once: true });
+  window.setTimeout(showAddressFallback, 15000);
+  window.addEventListener('offline', showAddressFallback, { once: true });
+  if (stack?.closest('.location-section')) frame.classList.add('map-scroll-safe');
+}
 
 for (const button of document.querySelectorAll('[data-room]')) {
   const room = button.dataset.room;
