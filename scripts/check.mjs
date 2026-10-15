@@ -25,6 +25,10 @@ for (const name of files) {
 }
   const photos = ['hotel-exterior.png', 'room-warm.png', 'room-sunlit.png', 'room-red.png', 'jacuzzi.png', 'event-hall.png', 'dining-room.png', 'bar.png', 'lounge.png', 'lobby.png'];
 for (const photo of photos) if (!fs.existsSync(path.join(root, 'assets', 'images', photo))) failures.push(`Missing hotel photo ${photo}`);
+const eventHall = fs.readFileSync(path.join(root, 'assets', 'images', 'event-hall.png'));
+const eventHallWidth = eventHall.readUInt32BE(16);
+const eventHallHeight = eventHall.readUInt32BE(20);
+if (eventHallWidth < 1300 || eventHallHeight < 950) failures.push(`Event hall photo should be enhanced/upscaled; found ${eventHallWidth}x${eventHallHeight}`);
 for (const route of ['rooms/', 'conference/', 'contact/']) {
   const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const routeName = route.slice(0, -1);
