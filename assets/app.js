@@ -51,3 +51,29 @@ for (const button of document.querySelectorAll('[data-room]')) {
   const message = `Hi Victory View. I would like to book a ${room} for [dates]. Please confirm availability.`;
   button.href = `https://wa.me/2348101064294?text=${encodeURIComponent(message)}`;
 }
+
+const stayForm = document.querySelector('#stay-enquiry');
+if (stayForm) {
+  const checkin = stayForm.elements.checkin;
+  const checkout = stayForm.elements.checkout;
+  const today = new Date();
+  const localDate = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  checkin.min = localDate(today);
+  checkout.min = localDate(today);
+  const updateDates = () => {
+    if (!checkin.value) return;
+    const nextDay = new Date(`${checkin.value}T12:00:00`);
+    nextDay.setDate(nextDay.getDate() + 1);
+    checkout.min = localDate(nextDay);
+    if (checkout.value && checkout.value <= checkin.value) checkout.value = '';
+  };
+  checkin.addEventListener('change', updateDates);
+  stayForm.addEventListener('submit', event => {
+    event.preventDefault();
+    updateDates();
+    if (!stayForm.reportValidity()) return;
+    const room = stayForm.elements.room.value;
+    const message = `Hello Victory View Hotel & Suites. I'd like to enquire about a stay from ${checkin.value} to ${checkout.value}. Room preference: ${room}. Please confirm availability and current rates.`;
+    window.open(`https://wa.me/2348101064294?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+  });
+}
