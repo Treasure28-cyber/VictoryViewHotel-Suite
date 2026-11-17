@@ -77,3 +77,51 @@ if (stayForm) {
     window.open(`https://wa.me/2348101064294?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   });
 }
+
+// One-time entrance sequences. Content stays visible without JavaScript.
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+const header = document.querySelector('.site-header');
+let scrollQueued = false;
+const updateHeader = () => {
+  header?.classList.toggle('is-scrolled', window.scrollY > 60);
+  scrollQueued = false;
+};
+window.addEventListener('scroll', () => {
+  if (!scrollQueued) {
+    scrollQueued = true;
+    window.requestAnimationFrame(updateHeader);
+  }
+}, { passive: true });
+updateHeader();
+
+const revealTargets = document.querySelectorAll('.section-head, .room-card, .welcome-layout > div, .amenities-copy, .amenities-grid > div, .conference-photo, .conference-copy, .dining-copy, .dining-photos, .testimonial, .location-grid > div, .room-detail-photo, .room-detail-copy, .conference-detail > div, .event-gallery figure, .full-gallery figure, .contact-grid > div, .footer-invitation, .footer-top > div');
+let revealObserver;
+const finishReveals = () => {
+  revealObserver?.disconnect();
+  for (const element of revealTargets) element.classList.remove('reveal-pending');
+};
+if (!motionPreference.matches && 'IntersectionObserver' in window) {
+  revealObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        entry.target.classList.remove('reveal-pending');
+        revealObserver.unobserve(entry.target);
+      }
+    }
+  }, { threshold: 0.08, rootMargin: '0px 0px -25px 0px' });
+  for (const element of revealTargets) {
+    // Anchor destinations and already-visible content must never be hidden.
+    if (element.getBoundingClientRect().top < window.innerHeight) continue;
+    const siblings = [...element.parentElement.children];
+    element.style.setProperty('--reveal-delay', `${Math.min(siblings.indexOf(element), 3) * 65}ms`);
+    element.classList.add('reveal-pending');
+    revealObserver.observe(element);
+  }
+  document.addEventListener('focusin', event => {
+    event.target.closest('.reveal-pending')?.classList.remove('reveal-pending');
+  });
+  window.addEventListener('beforeprint', finishReveals);
+}
+motionPreference.addEventListener('change', event => {
+  if (event.matches) finishReveals();
+});
