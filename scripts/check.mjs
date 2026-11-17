@@ -50,7 +50,7 @@ for (const [name, html] of [['Home', homeHtml], ['Contact', contactHtml]]) {
   if (!html.includes('title="Map showing Victory View Hotel &amp; Suites at 122 DSC Expressway, Udu"')) failures.push(`${name}: map title missing or incorrect`);
   if (!html.includes('loading="lazy"') || !html.includes('referrerpolicy="no-referrer-when-downgrade"')) failures.push(`${name}: map loading or referrer attributes missing`);
   if (!html.includes('map-fallback')) failures.push(`${name}: address fallback missing`);
-  if (!html.includes('target="_blank" rel="noopener"')) failures.push(`${name}: directions link attributes missing`);
+  if (!/target="_blank" rel="noopener(?: noreferrer)?"/.test(html)) failures.push(`${name}: directions link attributes missing`);
   if (!html.includes('>Get directions</a>')) failures.push(`${name}: directions button label mismatch`);
 }
 if (!fs.readFileSync(path.join(root, 'assets/app.js'), 'utf8').includes("export const MAP_EMBED_URL = 'https://www.google.com/maps?q=Victory+View+Hotel+%26+Suites+122+DSC+Expressway+Ovwian+Axis+Udu+Delta+State+Nigeria&output=embed'")) failures.push('Map embed URL constant mismatch');
